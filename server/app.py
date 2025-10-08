@@ -3,6 +3,10 @@
 
 # Standard library imports
 import os
+import sys
+
+# Add the parent directory to the Python path
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 # Remote library imports
 from flask import Flask
@@ -19,9 +23,8 @@ from resources import(
 )
 
 # Instantiate app, set attributes
-app = Flask(__name__)
-import os
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(app.root_path, "instance", "app.db")}'
+app = Flask(__name__, instance_path=os.path.join(os.path.dirname(__file__), '..', 'instance'))
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(app.instance_path, "app.db")}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.json.compact = False
 
