@@ -19,12 +19,12 @@ from models import db  # Import db from models
 
 #Important resources
 from resources import(
-    UsersResource,UserByIdResource,StudentsResource,StudentByIdResource,CoursesResource,CourseByIdResource,EnrollmentsResource,EnrollmentByIdResource,CourseEnrollmentsResource,StudentEnrollmentsResource,InstructorsResource,InstructorByIdResource,InstructorCoursesResource,SighnupResource,LoginResource,LogoutResource
+    UsersResource,UserByIdResource,StudentsResource,StudentByIdResource,CoursesResource,CourseByIdResource,EnrollmentsResource,EnrollmentByIdResource,CourseEnrollmentsResource,StudentEnrollmentsResource,InstructorsResource,InstructorByIdResource,InstructorCoursesResource,SignupResource,LoginResource,LogoutResource
 )
 
 # Instantiate app, set attributes
 app = Flask(__name__, instance_path=os.path.join(os.path.dirname(__file__), '..', 'instance'))
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(app.instance_path, "app.db")}'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', f'sqlite:///{os.path.join(app.instance_path, "app.db")}')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.json.compact = False
 
@@ -48,7 +48,7 @@ CORS(app)
 
 
 # add API routes
-api.add_resource(SighnupResource, '/auth/signup')
+api.add_resource(SignupResource, '/auth/signup')
 api.add_resource(LoginResource, '/auth/login')
 api.add_resource(LogoutResource, '/auth/logout')
 api.add_resource(UsersResource, '/users')
@@ -70,4 +70,5 @@ def home():
     return 'Course Hub API'
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=False, port=port)

@@ -6,6 +6,7 @@ from sqlalchemy import MetaData, Integer, String, Column, ForeignKey, DateTime, 
 from flask_sqlalchemy import SQLAlchemy
 import re
 import jwt
+import os
 from flask_bcrypt import Bcrypt
 
 # Define naming convention
@@ -47,13 +48,15 @@ class Users(db.Model, SerializerMixin):
             'role': self.role,
             'exp': datetime.utcnow() + timedelta(days=1)
         }
-        return jwt.encode(payload, 'secret_key', algorithm='HS256')    
+        secret_key = os.environ.get('SECRET_KEY', 'default_secret_key')
+        return jwt.encode(payload, secret_key, algorithm='HS256')
     @staticmethod
     def verify_token(token):
         try:
-            payload = jwt.decode(token, 'secret_key', algorithms=['HS256'])
+            secret_key = os.environ.get('SECRET_KEY', 'default_secret_key')
+            payload = jwt.decode(token, secret_key, algorithms=['HS256'])
             return Users.query.get(payload['user_id'])
-        except: 
+        except:
             return None
 
     def __repr__(self):
