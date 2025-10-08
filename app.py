@@ -20,7 +20,7 @@ from server.resources import(
 )
 
 # Instantiate app, set attributes
-app = Flask(__name__, instance_path=os.path.join(os.path.dirname(__file__), '..', 'instance'))
+app = Flask(__name__, instance_path=os.path.join(os.path.dirname(__file__), '..', 'instance'), static_folder='client/build', static_url_path='/')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', f'sqlite:///{os.path.join(app.instance_path, "app.db")}')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.json.compact = False
@@ -65,6 +65,13 @@ api.add_resource(InstructorCoursesResource, '/instructors/<int:instructor_id>/co
 @app.route('/')
 def home():
     return 'Course Hub API'
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
+    if path.startswith('api/'):
+        return 'Not Found', 404
+    return app.send_static_file('index.html')
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
